@@ -29,12 +29,18 @@ import com.example.mvaladezmusicapp.ui.MiniPlayer
 @Composable
 fun HomeScreen(onAlbumClick: (String) -> Unit) {
     var albums by remember { mutableStateOf<List<Album>>(emptyList()) }
+    var selectedAlbumId by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(true) }
     var isError by remember { mutableStateOf(false) }
 
+    val selectedAlbum = remember(selectedAlbumId, albums) {
+        albums.find { it.id == selectedAlbumId } ?: albums.firstOrNull()
+    }
+
     LaunchedEffect(Unit) {
         try {
-            albums = MusicApi.retrofitService.getAlbums()
+            val response = MusicApi.retrofitService.getAlbums()
+            albums = response
         } catch (e: Exception) {
             isError = true
         } finally {
@@ -43,7 +49,7 @@ fun HomeScreen(onAlbumClick: (String) -> Unit) {
     }
 
     Scaffold(
-        bottomBar = { MiniPlayer(album = albums.firstOrNull()) }
+        bottomBar = { MiniPlayer(album = selectedAlbum) }
     ) { innerPadding ->
         when {
             isLoading -> {
@@ -62,46 +68,58 @@ fun HomeScreen(onAlbumClick: (String) -> Unit) {
                         .padding(innerPadding)
                         .fillMaxSize()
                 ) {
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(150.dp)
-                            .background(
-                                Brush.verticalGradient(
-                                    colors = listOf(Color(0xFF6200EE).copy(alpha = 0.2f), Color.Transparent)
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(150.dp)
+                                .background(
+                                    Brush.verticalGradient(
+                                        colors = listOf(Color(0xFF6200EE).copy(alpha = 0.2f), Color.Transparent)
+                                    )
                                 )
-                            )
-                    ) {
-                        HeaderSection()
+                        ) {
+                            HeaderSection()
+                        }
                     }
-                }
-                item {
-                    Text(
-                        "Albums",
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.padding(16.dp),
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                item {
-                    AlbumsRow(albums = albums, onAlbumClick = onAlbumClick)
-                }
-                item {
-                    Text(
-                        "Recently Played",
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.padding(16.dp),
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                items(albums.reversed()) { album ->
-                    RecentlyPlayedItem(album = album, onAlbumClick = onAlbumClick)
+                    item {
+                        Text(
+                            "Albums",
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.padding(16.dp),
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    item {
+                        AlbumsRow(
+                            albums = albums, 
+                            onAlbumClick = { id ->
+                                selectedAlbumId = id
+                                onAlbumClick(id)
+                            }
+                        )
+                    }
+                    item {
+                        Text(
+                            "Recently Played",
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.padding(16.dp),
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    items(albums.reversed(), key = { it.id }) { album ->
+                        RecentlyPlayedItem(
+                            album = album, 
+                            onAlbumClick = { id ->
+                                selectedAlbumId = id
+                                onAlbumClick(id)
+                            }
+                        )
+                    }
                 }
             }
         }
     }
-}
 }
 
 @Composable
