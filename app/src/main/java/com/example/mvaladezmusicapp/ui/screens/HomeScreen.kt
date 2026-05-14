@@ -42,7 +42,7 @@ fun HomeScreen(onAlbumClick: (String) -> Unit) {
     }
 
     Scaffold(
-        bottomBar = { MiniPlayer() }
+        bottomBar = { MiniPlayer(album = albums.firstOrNull()) }
     ) { innerPadding ->
         if (isLoading) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

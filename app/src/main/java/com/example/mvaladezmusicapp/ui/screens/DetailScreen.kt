@@ -40,7 +40,7 @@ fun DetailScreen(albumId: String) {
     }
 
     Scaffold(
-        bottomBar = { MiniPlayer() }
+        bottomBar = { MiniPlayer(album = album) }
     ) { innerPadding ->
         if (isLoading) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

@@ -1,7 +1,7 @@
 package com.example.mvaladezmusicapp.data
 
+import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerialName
 
 @Serializable
 data class Album(
@@ -9,6 +9,6 @@ data class Album(
     val title: String,
     val artist: String,
     val description: String,
-    @SerialName("image")
+    @SerializedName("image")
     val imageUrl: String
 )

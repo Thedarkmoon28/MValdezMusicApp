@@ -19,8 +19,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 
+import com.example.mvaladezmusicapp.data.Album
+
 @Composable
-fun MiniPlayer() {
+fun MiniPlayer(album: Album? = null) {
     Surface(
         color = Color(0xFF212121), // Color oscuro simple
         modifier = Modifier
@@ -32,7 +34,7 @@ fun MiniPlayer() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
-                model = "https://musicapi.pjasoft.com/images/album1.jpg", 
+                model = album?.imageUrl ?: "https://upload.wikimedia.org/wikipedia/en/3/3b/Dark_Side_of_the_Moon.png", 
                 contentDescription = null,
                 modifier = Modifier
                     .size(40.dp)
@@ -46,14 +48,14 @@ fun MiniPlayer() {
                     .padding(start = 12.dp)
             ) {
                 Text(
-                    "Midnight City", 
+                    album?.title ?: "Select an album", 
                     color = Color.White, 
                     fontWeight = FontWeight.Bold, 
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1
                 )
                 Text(
-                    "M83", 
+                    album?.artist ?: "No artist",
                     color = Color.White.copy(alpha = 0.7f), 
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 1
