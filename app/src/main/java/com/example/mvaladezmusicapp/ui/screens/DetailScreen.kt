@@ -28,12 +28,13 @@ import com.example.mvaladezmusicapp.ui.MiniPlayer
 fun DetailScreen(albumId: String) {
     var album by remember { mutableStateOf<Album?>(null) }
     var isLoading by remember { mutableStateOf(true) }
+    var isError by remember { mutableStateOf(false) }
 
     LaunchedEffect(albumId) {
         try {
             album = MusicApi.retrofitService.getAlbumById(albumId)
         } catch (e: Exception) {
-            // Error
+            isError = true
         } finally {
             isLoading = false
         }
@@ -42,28 +43,36 @@ fun DetailScreen(albumId: String) {
     Scaffold(
         bottomBar = { MiniPlayer(album = album) }
     ) { innerPadding ->
-        if (isLoading) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+        when {
+            isLoading -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
             }
-        } else if (album != null) {
-            val currentAlbum = album!!
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = innerPadding.calculateBottomPadding())
-            ) {
-                item {
-                    AlbumHeader(currentAlbum)
+            isError -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Error al cargar los datos", color = Color.Red)
                 }
-                item {
-                    AboutAlbum(currentAlbum.description)
-                }
-                item {
-                    ArtistChip(currentAlbum.artist)
-                }
-                items(List(10) { it + 1 }) { trackNumber ->
-                    TrackItem(currentAlbum, trackNumber)
+            }
+            album != null -> {
+                val currentAlbum = album!!
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = innerPadding.calculateBottomPadding())
+                ) {
+                    item {
+                        AlbumHeader(currentAlbum)
+                    }
+                    item {
+                        AboutAlbum(currentAlbum.description)
+                    }
+                    item {
+                        ArtistChip(currentAlbum.artist)
+                    }
+                    items(List(10) { it + 1 }) { trackNumber ->
+                        TrackItem(currentAlbum, trackNumber)
+                    }
                 }
             }
         }

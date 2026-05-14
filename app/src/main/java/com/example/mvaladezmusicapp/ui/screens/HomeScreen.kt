@@ -30,12 +30,13 @@ import com.example.mvaladezmusicapp.ui.MiniPlayer
 fun HomeScreen(onAlbumClick: (String) -> Unit) {
     var albums by remember { mutableStateOf<List<Album>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
+    var isError by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         try {
             albums = MusicApi.retrofitService.getAlbums()
         } catch (e: Exception) {
-            // Manejar error
+            isError = true
         } finally {
             isLoading = false
         }
@@ -44,16 +45,23 @@ fun HomeScreen(onAlbumClick: (String) -> Unit) {
     Scaffold(
         bottomBar = { MiniPlayer(album = albums.firstOrNull()) }
     ) { innerPadding ->
-        if (isLoading) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+        when {
+            isLoading -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
             }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
-            ) {
+            isError -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Error al cargar los datos", color = Color.Red)
+                }
+            }
+            else -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize()
+                ) {
                 item {
                     Box(
                         modifier = Modifier
@@ -93,6 +101,7 @@ fun HomeScreen(onAlbumClick: (String) -> Unit) {
             }
         }
     }
+}
 }
 
 @Composable
