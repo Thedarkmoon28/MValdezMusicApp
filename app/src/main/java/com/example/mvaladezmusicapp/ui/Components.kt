@@ -23,6 +23,8 @@ import com.example.mvaladezmusicapp.data.Album
 
 @Composable
 fun MiniPlayer(album: Album? = null) {
+    var isPlaying by remember { mutableStateOf(false) }
+
     Surface(
         color = Color(0xFF212121), // Color oscuro simple
         modifier = Modifier
@@ -55,17 +57,17 @@ fun MiniPlayer(album: Album? = null) {
                     maxLines = 1
                 )
                 Text(
-                    album?.artist ?: "No artist",
+                    album?.artist ?: "No artist", 
                     color = Color.White.copy(alpha = 0.7f), 
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 1
                 )
             }
             
-            IconButton(onClick = { }) {
+            IconButton(onClick = { isPlaying = !isPlaying }) {
                 Icon(
-                    Icons.Default.PlayArrow, 
-                    contentDescription = "Play", 
+                    imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow, 
+                    contentDescription = if (isPlaying) "Pause" else "Play",
                     tint = Color.White
                 )
             }
